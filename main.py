@@ -16,7 +16,7 @@ current_generation = 0 # Счетчик поколений
 class Car:
 
     def __init__(self):
-        # Загрузка спрайта машины и его поворот
+        # Загрузка рисунка машины
         self.sprite = pygame.image.load('car.png').convert() # Конвертация для ускорения
         self.sprite = pygame.transform.scale(self.sprite, (CAR_SIZE_X, CAR_SIZE_Y))
         self.rotated_sprite = self.sprite 
@@ -36,7 +36,6 @@ class Car:
         self.draw_radar(screen) 
 
     def draw_radar(self, screen):
-        # Опционально отрисовать все сенсоры / радары
         for radar in self.radars:
             position = radar[0]
             pygame.draw.line(screen, (0, 255, 0), self.center, position, 1)
@@ -45,8 +44,7 @@ class Car:
     def check_collision(self, game_map):
         self.alive = True
         for point in self.corners:
-            # Если любая из углов касается цвета границы -> авария
-            # Предполагается прямоугольник
+            # Если прямоугольник касается цвета границы -> авария
             if game_map.get_at((int(point[0]), int(point[1]))) == BORDER_COLOR:
                 self.alive = False
                 break
@@ -56,7 +54,7 @@ class Car:
         x = int(self.center[0] + math.cos(math.radians(360 - (self.angle + degree))) * length)
         y = int(self.center[1] + math.sin(math.radians(360 - (self.angle + degree))) * length)
 
-        # Пока не столкнемся с BORDER_COLOR И длина < 300 (максимум) -> идем дальше
+        # Пока не столкнемся с границей длина < 300 (максимум) -> идем дальше
         while not game_map.get_at((x, y)) == BORDER_COLOR and length < 300:
             length = length + 1
             x = int(self.center[0] + math.cos(math.radians(360 - (self.angle + degree))) * length)
@@ -73,7 +71,7 @@ class Car:
             self.speed = 20
             self.speed_set = True
 
-        # Получить повернутый спрайт и двигаться в правильном направлении по X
+        # Получить повернутый рисунок и двигаться в правильном направлении по X
         # Не позволять машине приближаться к краю менее чем на 20px
         self.rotated_sprite = self.rotate_center(self.sprite, self.angle)
         self.position[0] += math.cos(math.radians(360 - self.angle)) * self.speed
@@ -119,11 +117,11 @@ class Car:
         return return_values
 
     def is_alive(self):
-        # Базовая функция проверки живости
+        # Базовая функция проверки жива ли машина
         return self.alive
 
     def get_reward(self):
-        # Вычислить награду (возможно, изменить?)
+        # Вычислить награду
         return self.distance / (CAR_SIZE_X / 2)
 
     def rotate_center(self, image, angle):
@@ -187,7 +185,7 @@ def run_simulation(genomes, config):
             else:
                 car.speed += 2 # Ускорение
         
-        # Проверка, жива ли ли машина
+        # Проверка, жива ли машина
         still_alive = 0
         for i, car in enumerate(cars):
             if car.is_alive():
