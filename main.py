@@ -117,7 +117,7 @@ class Car:
         return return_values
 
     def is_alive(self):
-        # Базовая функция проверки жива ли машина
+        # Базовая функция жива ли машина
         return self.alive
 
     def get_reward(self):
